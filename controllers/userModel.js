@@ -62,7 +62,7 @@ if(checkEmail){
    return res.status(400).send({status:false , message:"This email is already exist"})
 }
 }
-const updateData = await TravellerModel.findOneAndUpdate({_id:req.userId},{...data})
+const updateData = await TravellerModel.findOneAndUpdate({_id:req.userId},{...data},{new:true})
 res.status(200).send({status:true , message:"successfully updated", data:updateData})
     }catch(err){
         res.status(500).send({status:true , message:err.message})
@@ -73,7 +73,7 @@ res.status(200).send({status:true , message:"successfully updated", data:updateD
 //====================== delete ===========================================
 
 
-exports.delete = async (req,res)=>{
+exports.deleteData = async (req,res)=>{
     try{
     const deleteData = await TravellerModel.findOneAndDelete({_id:req.userId})
 if(!deleteData){
@@ -87,7 +87,15 @@ if(!deleteData){
 }
 
 
+//================= get details ==============================
 
+exports.getData = async (req, res)=>{
+    
+const data = await TravellerModel.findById(req.userId)
+
+res.status(200).send({status:true, data:data})
+
+}
 
 
 
