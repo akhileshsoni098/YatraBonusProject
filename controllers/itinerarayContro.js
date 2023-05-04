@@ -2,6 +2,28 @@ const mongoose = require("mongoose");
 const itineryModel = require("../models/itinerarySchema");
 const TravellerModel = require("../models/userModel");
 
+const redis=require('redis')
+const {promisify}=require("util")
+
+//1. Connect to the redis server
+
+const redisClient = redis.createClient(
+  11502,
+    "redis-11502.c301.ap-south-1-1.ec2.cloud.redislabs.com",
+    { no_ready_check: true }
+  );
+  redisClient.auth("PsDT0yqED0m07KGYrh3Obclmn2zeH6od", function (err) {
+    if (err) throw err;
+  });
+  
+  redisClient.on("connect", async function () {
+    console.log("Connected to Redis..");
+  });
+
+ //--creating GET_ASYNC and SETASYNC-----------------
+ const SETEX_ASYNC = promisify(redisClient.SETEX).bind(redisClient);
+ const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
+ 
 exports.createItinery = async (req, res) => {
   try {
     let data = req.body;
@@ -44,9 +66,22 @@ exports.createItinery = async (req, res) => {
           message:
             "queries can be only destination, travelDates, activities, accommodations",
         });
+// let longUrl;
+//         let redisdata = await GET_ASYNC(`${longUrl}`);
+//         if (redisdata) {
+//            redisdata = JSON.parse(redisdata);
+//            console.log(redisdata)
+//            return res.status(200).send({data:redisdata});
+//         } 
 
+        
     userId = data.userId = req.userId;
     const itineryCreated = await itineryModel.create(data);
+
+    // await SETEX_ASYNC(`${longUrl}`,86400, JSON.stringify(itineryCreated));
+   
+
+
     return res
       .status(201)
       .send({
@@ -61,15 +96,27 @@ exports.createItinery = async (req, res) => {
 
 exports.getItinery = async (req, res) => {
   try {
+    // console.log("newAnmol")
+    // let long;
+    // let redisdata = await GET_ASYNC(`${long}`);
+    // if (redisdata) {
+    //    redisdata = JSON.parse(redisdata);
+      //  console.log(redisdata)
+    //    return res.status(200).send({data:redisdata, message:"jjkjkkjkjkjk"});
+    // } 
+    // console.log("newAnmol")
+
     const getInfo = await itineryModel.find({ userId: req.userId }).populate({
       path: "userId",
       model: "Traveller",
       select: { _id: 0, name: 1, email: 1 },
     });
 
+
+
     if (!getInfo)
       return res.status(404).send({ status: false, message: "info not found" });
-
+  // await SETEX_ASYNC(`${long}`,86400, JSON.stringify(getInfo));
     return res
       .status(200)
       .send({ status: true, message: "success Response", data: getInfo });

@@ -5,6 +5,7 @@ const TravellerModel = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 
 // ================= register =====================
+
 exports.register = async (req, res)=>{
     try{
 let data = req.body
@@ -24,7 +25,7 @@ res.status(201).send({status:true , message:"successfully registered", data:save
     }
 }
 
-//============login ======================
+//============ login ======================
 
 
 exports.logIn = async (req,res)=>{
@@ -52,6 +53,7 @@ res.status(200).send({status:true, message:"successfully Logged in", token:token
 }
 
 //========================= update =================================
+
 exports.update = async (req, res)=>{
     try{
 let data = req.body
@@ -94,7 +96,6 @@ exports.getData = async (req, res)=>{
 const data = await TravellerModel.findById(req.userId)
 
 res.status(200).send({status:true, data:data})
-
 }
 
 
